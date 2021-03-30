@@ -18,9 +18,10 @@ CCI_GITHUB_ROOT="https://raw.githubusercontent.com/CircleCI-Public/circleci-dock
 aws ecr get-login-password --region $AWS_REGION | \
     docker login --username AWS --password-stdin $AWS_ACCT.dkr.ecr.$AWS_REGION.amazonaws.com
 
-# Get the CircleCI PHP recipe for the specific PHP version and build it locally, and also inject a
-# sockets extension install command while we're here (needed by datadog)
-( curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/Dockerfile" ; echo RUN sudo docker-php-ext-install sockets ) | \
+# Get the CircleCI PHP recipe for the specific PHP version and build it locally, and also inject an
+# install of the php sockets extension, required for datadog
+( curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/Dockerfile"
+  echo RUN sudo docker-php-ext-install sockets pdo pdo_mysql ) | \
     docker build -t $REPO:php$VER_PHP -
 
 # Get the Node recipe and inject our specific required Node version
