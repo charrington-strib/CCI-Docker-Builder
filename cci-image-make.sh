@@ -29,8 +29,9 @@ curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/node/Dockerfile" | \
     sed -e "s/^FROM .*$/FROM $REPO:php$VER_PHP/" -e "s/^ENV NODE_VERSION.*/ENV NODE_VERSION $VER_NODE/" |\
     docker build -t $REPO:php$VER_PHP-node$VER_NODE -
 
-# Get the browsers layer and put that on too
-curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/node-browsers-legacy/Dockerfile" | \
+# Get the browsers layer and put that on too, and also inject an install of nginx and supervisor
+( curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/node-browsers-legacy/Dockerfile" 
+  echo RUN sudo apt-get -y install nginx supervisor ) | \
     sed -e "s/^FROM .*$/FROM $REPO:php$VER_PHP-node$VER_NODE/" |\
     docker build -t $REPO:php$VER_PHP-node$VER_NODE-browsers -
 
