@@ -31,7 +31,12 @@ curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/node/Dockerfile" | \
 
 # Get the browsers layer and put that on too, and also inject an install of nginx and supervisor
 ( curl "$CCI_GITHUB_ROOT/php/images/$VER_PHP-fpm-buster/node-browsers-legacy/Dockerfile" 
-  echo RUN sudo apt-get -y install nginx supervisor ) | \
+  echo RUN sudo apt-get -y install nginx supervisor lsb-release
+  echo RUN wget -O /tmp/mysql.deb 'https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb'
+  echo RUN sudo dpkg -i /tmp/mysql.deb
+  echo RUN sudo apt update
+  echo RUN sudo apt install mysql-client
+) | \
     sed -e "s/^FROM .*$/FROM $REPO:php$VER_PHP-node$VER_NODE/" |\
     docker build -t $REPO:php$VER_PHP-node$VER_NODE-browsers -
 
